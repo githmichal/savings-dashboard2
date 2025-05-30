@@ -1,8 +1,8 @@
 // src/context/AppDataContext.js
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
 // URL do API Google Sheets
-const API_URL = 'https://script.google.com/macros/s/AKfycbwzv-eM_I9jb8Hw4z1OU0fOrW-6-XUOpbUyYKqkA79UjkihroSuLkHUXLqK785MNH0QpQ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxm9wuadf18rwliSnYHUcgOdxYZfuk7HgTSj82Xrzl5w7-o5zVm1z-pYUYsAY6FDOVn/exec';
 
 // Utworzenie kontekstu
 const AppDataContext = createContext();
@@ -72,8 +72,8 @@ export const AppDataProvider = ({ children }) => {
     setAutoRefresh(!autoRefresh);
   };
   
-  // Ręczne odświeżenie danych z API
-  const refreshData = async () => {
+  // Ręczne odświeżenie danych z API - użyj useCallback aby uniknąć rekonstrukcji
+  const refreshData = useCallback(async () => {
     // Odświeżamy tylko jeśli dane pochodzą z API
     if (dataSource === 'api' && dataLoaded) {
       try {
@@ -115,7 +115,7 @@ export const AppDataProvider = ({ children }) => {
         // Można tutaj zaimplementować pokazywanie błędu użytkownikowi, np. przez state
       }
     }
-  };
+  }, [dataSource, dataLoaded]); // Dodaj zależności do useCallback
   
   // Automatyczne odświeżanie danych
   useEffect(() => {

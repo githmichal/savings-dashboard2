@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Card } from 'react-bootstrap';
 import { Chart, registerables } from 'chart.js';
 import { useAppData } from '../../context/AppDataContext';
-import { formatCurrency, formatPercent } from '../../utils/dataProcessing';
+import { formatCurrency } from '../../utils/dataProcessing';
 
 // Rejestracja wszystkich komponentów Chart.js
 Chart.register(...registerables);
