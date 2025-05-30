@@ -1,0 +1,90 @@
+:root {
+  --olimp-orange: #FF5000;
+  --olimp-orange-light: #FF8040;
+  --olimp-dark: #333333;
+  --olimp-light: #F8F9FA;
+  --olimp-gray: #E8EAED;
+}
+
+body {
+  font-family: 'Roboto', 'Segoe UI', sans-serif;
+  background-color: #FAFAFA;
+}
+
+.navbar-brand {
+  margin-right: 2rem;
+}
+
+.btn-primary {
+  background-color: var(--olimp-orange);
+  border-color: var(--olimp-orange);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--olimp-orange-light);
+  border-color: var(--olimp-orange-light);
+}
+
+.card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  background-color: white;
+  border-bottom: 1px solid var(--olimp-gray);
+  font-weight: 600;
+}
+
+.indicator-value {
+  color: var(--olimp-orange);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--olimp-orange);
+  border-bottom-color: var(--olimp-orange);
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link {
+  color: var(--olimp-dark);
+}
+
+.table {
+  margin-top: 1rem;
+}
+
+.table thead th {
+  background-color: var(--olimp-light);
+  border-top: none;
+  font-weight: 500;
+}
+
+.no-data-view {
+  color: var(--olimp-gray);
+}
+
+.drop-zone {
+  border: 2px dashed var(--olimp-gray);
+  border-radius: 5px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.drop-zone:hover, .drop-zone.active {
+  border-color: var(--olimp-orange);
+  background-color: rgba(255, 80, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1.25rem;
+  }
+}

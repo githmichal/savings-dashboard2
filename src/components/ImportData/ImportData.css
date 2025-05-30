@@ -1,0 +1,17 @@
+.drop-zone {
+    border: 2px dashed #E8EAED;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  
+  .drop-zone:hover, 
+  .drop-zone.active {
+    border-color: #FF5000;
+    background-color: rgba(255, 80, 0, 0.05);
+  }
+  
+  .drop-zone input[type="file"] {
+    margin: 0 auto;
+  }
