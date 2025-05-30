@@ -2,7 +2,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
 // URL do API Google Sheets
-const API_URL = 'https://script.google.com/macros/s/AKfycbx2VeHln3nrvxb8l0jb0rr3QZZHa3kJD532MHjJVxN1lvWEo81V4Urd1NYHWwYyMhXJ6w/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbytfqhcMms--K_jiAC6yEPGdG8yO3qAfTTdFtthbKgdbeEg9f1MT8H8dmXVSJiqwgRykw/exec';
 
 // Utworzenie kontekstu
 const AppDataContext = createContext();
@@ -88,7 +88,6 @@ export const AppDataProvider = ({ children }) => {
         // Sprawdzamy, czy otrzymane dane zawierają informację o błędzie
         if (data.error) {
           throw new Error(`Błąd API: ${data.message}`);
-          return;
         }
         
         // Aktualizujemy dane w aplikacji
@@ -116,7 +115,7 @@ export const AppDataProvider = ({ children }) => {
         console.log('Wyłączono automatyczne odświeżanie');
       }
     };
-  }, [autoRefresh, dataSource, dataLoaded, refreshInterval]);
+  }, [autoRefresh, dataSource, dataLoaded, refreshInterval, refreshData]);
 
   return (
     <AppDataContext.Provider value={{

@@ -16,7 +16,7 @@ function ImportData() {
   const fileInputRef = useRef(null);
   
   // URL do naszego API Google Sheets
-  const API_URL = 'https://script.google.com/macros/s/AKfycbx2VeHln3nrvxb8l0jb0rr3QZZHa3kJD532MHjJVxN1lvWEo81V4Urd1NYHWwYyMhXJ6w/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbytfqhcMms--K_jiAC6yEPGdG8yO3qAfTTdFtthbKgdbeEg9f1MT8H8dmXVSJiqwgRykw/exec';
 
   const handleFileChange = (e) => {
     if (e.target.files.length > 0) {
@@ -198,7 +198,7 @@ function ImportData() {
           <Button 
             variant="primary" 
             onClick={handleImport}
-            disabled={dataSource === 'file' && !selectedFile || isLoading}
+            disabled={(dataSource === 'file' && !selectedFile) || isLoading}
           >
             {isLoading ? 'Importowanie...' : 'Importuj dane'}
           </Button>
