@@ -1,9 +1,11 @@
+// src/App.js
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { AppDataProvider } from './context/AppDataContext';
 import ImportData from './components/ImportData/ImportData';
 import Filters from './components/Filters/Filters';
+import Dashboard from './components/Dashboard/Dashboard';
 
 function App() {
   return (
@@ -32,7 +34,7 @@ function App() {
         <main className="container my-4">
           <ImportData />
           <Filters />
-          {/* Komponenty Dashboard będą dodawane w następnych krokach */}
+          <Dashboard />
         </main>
 
         <footer className="bg-light py-3 mt-5">

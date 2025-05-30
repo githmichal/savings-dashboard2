@@ -1,0 +1,16 @@
+/* Dashboard.css */
+.no-data-view {
+    padding: 3rem 0;
+    text-align: center;
+    color: var(--olimp-gray);
+  }
+  
+  .no-data-view h3 {
+    margin-top: 1rem;
+    font-weight: 500;
+  }
+  
+  .chart-container {
+    height: 300px;
+    position: relative;
+  }

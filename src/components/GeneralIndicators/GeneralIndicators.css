@@ -1,0 +1,20 @@
+/* GeneralIndicators.css */
+.indicator-card {
+    transition: transform 0.2s;
+  }
+  
+  .indicator-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .indicator-value {
+    color: var(--olimp-orange);
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+  
+  .indicator-title {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }

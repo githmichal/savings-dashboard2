@@ -1,0 +1,29 @@
+/* src/components/DataTables/DataTables.css */
+.nav-tabs .nav-link.active {
+    color: var(--olimp-orange);
+    border-bottom-color: var(--olimp-orange);
+    font-weight: 500;
+  }
+  
+  .nav-tabs .nav-link {
+    color: var(--olimp-dark);
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  .table {
+    min-width: 800px;
+  }
+  
+  .table thead th {
+    background-color: var(--olimp-light);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  .table-secondary.fw-bold {
+    background-color: #f8f9fa;
+  }

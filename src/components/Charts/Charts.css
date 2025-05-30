@@ -1,0 +1,13 @@
+/* Charts.css */
+.chart-container {
+    height: 300px;
+    position: relative;
+  }
+  
+  .card {
+    height: 100%;
+  }
+  
+  .card-header {
+    font-weight: 500;
+  }
