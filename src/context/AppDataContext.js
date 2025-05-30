@@ -77,16 +77,32 @@ export const AppDataProvider = ({ children }) => {
     // Odświeżamy tylko jeśli dane pochodzą z API
     if (dataSource === 'api' && dataLoaded) {
       try {
+        console.log('Rozpoczynam odświeżanie danych z API:', API_URL);
         const response = await fetch(API_URL);
+        console.log('Status odpowiedzi:', response.status, response.statusText);
         
         if (!response.ok) {
-          throw new Error(`Problem z pobraniem danych: ${response.statusText}`);
+          const errorText = await response.text();
+          console.error('Treść odpowiedzi z błędem:', errorText);
+          throw new Error(`Problem z pobraniem danych: ${response.statusText}. Status: ${response.status}`);
         }
         
-        const data = await response.json();
+        // Sprawdź, czy odpowiedź jest w formacie JSON
+        let data;
+        const responseText = await response.text();
+        console.log('Treść odpowiedzi (pierwsze 200 znaków):', responseText.substring(0, 200));
+        
+        try {
+          data = JSON.parse(responseText);
+        } catch (jsonError) {
+          console.error('Błąd parsowania JSON:', jsonError);
+          console.error('Otrzymany tekst (pierwsze 500 znaków):', responseText.substring(0, 500));
+          throw new Error('Otrzymano nieprawidłowy format danych (nie JSON)');
+        }
         
         // Sprawdzamy, czy otrzymane dane zawierają informację o błędzie
         if (data.error) {
+          console.error('API zwróciło błąd:', data.message, data);
           throw new Error(`Błąd API: ${data.message}`);
         }
         
@@ -95,6 +111,8 @@ export const AppDataProvider = ({ children }) => {
         console.log('Dane odświeżone z API:', new Date().toLocaleTimeString());
       } catch (error) {
         console.error('Błąd odświeżania danych:', error);
+        console.error('Szczegóły błędu:', error.stack || error.toString());
+        // Można tutaj zaimplementować pokazywanie błędu użytkownikowi, np. przez state
       }
     }
   };

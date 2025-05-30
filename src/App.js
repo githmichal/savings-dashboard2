@@ -7,6 +7,7 @@ import ImportData from './components/ImportData/ImportData';
 import Filters from './components/Filters/Filters';
 import Dashboard from './components/Dashboard/Dashboard';
 import StatusBar from './components/StatusBar/StatusBar';
+import ErrorLogger from './components/ErrorLogger/ErrorLogger';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
             <p className="text-muted mb-0">&copy; 2025 Olimp Marketplace. Wszystkie prawa zastrzeżone.</p>
           </div>
         </footer>
+        <ErrorLogger />
       </div>
     </AppDataProvider>
   );

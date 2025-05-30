@@ -16,7 +16,7 @@ function ImportData() {
   const fileInputRef = useRef(null);
   
   // URL do naszego API Google Sheets
-  const API_URL = 'https://script.google.com/macros/s/AKfycbytfqhcMms--K_jiAC6yEPGdG8yO3qAfTTdFtthbKgdbeEg9f1MT8H8dmXVSJiqwgRykw/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzumyl6kztN70Oc0jmPEdo6jhwCCD64e-T-QtA1avmXubQGXF2VNpEHDH4sELfUqoI1HA/exec';
 
   const handleFileChange = (e) => {
     if (e.target.files.length > 0) {
@@ -57,28 +57,69 @@ function ImportData() {
         const processedData = processData(parsedData);
         updateAppData(processedData, 'file');
       } else {
-        // Nowa logika pobierania danych z API
-        const response = await fetch(API_URL);
+        // Nowa logika pobierania danych z API z rozszerzonym logowaniem
+        console.log('Rozpoczynam pobieranie danych z API:', API_URL);
         
-        if (!response.ok) {
-          throw new Error(`Problem z pobraniem danych: ${response.statusText}`);
+        try {
+          const response = await fetch(API_URL);
+          console.log('Status odpowiedzi:', response.status, response.statusText);
+          
+          // Sprawdź, czy odpowiedź jest w formacie JSON
+          const contentType = response.headers.get('content-type');
+          console.log('Typ zawartości odpowiedzi:', contentType);
+          
+          if (!response.ok) {
+            // Spróbuj pobrać tekst błędu, nawet jeśli odpowiedź nie jest OK
+            const errorText = await response.text();
+            console.error('Treść odpowiedzi z błędem:', errorText);
+            throw new Error(`Problem z pobraniem danych: ${response.statusText}. Status: ${response.status}`);
+          }
+          
+          // Spróbuj przetworzyć odpowiedź jako JSON, ale z obsługą błędów
+          let data;
+          const responseText = await response.text();
+          console.log('Treść odpowiedzi (pierwsze 200 znaków):', responseText.substring(0, 200));
+          
+          try {
+            data = JSON.parse(responseText);
+          } catch (jsonError) {
+            console.error('Błąd parsowania JSON:', jsonError);
+            console.error('Otrzymany tekst (pierwsze 500 znaków):', responseText.substring(0, 500));
+            throw new Error('Otrzymano nieprawidłowy format danych (nie JSON)');
+          }
+          
+          // Sprawdzamy, czy otrzymane dane zawierają informację o błędzie
+          if (data.error) {
+            console.error('API zwróciło błąd:', data.message, data);
+            throw new Error(`Błąd API: ${data.message}`);
+          }
+          
+          console.log('Dane zostały pomyślnie pobrane i przetworzone');
+          
+          // Aktualizujemy dane w aplikacji, przekazując informację o źródle
+          updateAppData(data, 'api');
+        } catch (fetchError) {
+          console.error('Szczegółowy błąd fetch:', fetchError);
+          
+          // Sprawdź problemy związane z CORS
+          if (fetchError.message.includes('CORS') || 
+              fetchError.message.includes('Failed to fetch') || 
+              fetchError.message.includes('Network error')) {
+            console.error('Prawdopodobny problem z CORS lub konfiguracją Google Apps Script');
+            throw new Error('Problem z komunikacją z API. Sprawdź ustawienia CORS w Google Apps Script lub dostępność API.');
+          }
+          
+          throw fetchError;
         }
-        
-        const data = await response.json();
-        
-        // Sprawdzamy, czy otrzymane dane zawierają informację o błędzie
-        if (data.error) {
-          throw new Error(`Błąd API: ${data.message}`);
-        }
-        
-        // Aktualizujemy dane w aplikacji, przekazując informację o źródle
-        updateAppData(data, 'api');
       }
       
       setIsLoading(false);
     } catch (err) {
       console.error('Błąd importu:', err);
-      setError(err.message);
+      // Rozszerzone informacje o błędzie
+      const errorDetails = err.stack || err.toString();
+      console.error('Szczegóły błędu:', errorDetails);
+      setError(`${err.message} (Otwórz konsolę przeglądarki, aby zobaczyć więcej szczegółów)`);
       setIsLoading(false);
     }
   };
