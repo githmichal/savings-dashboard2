@@ -1,0 +1,21 @@
+/* src/components/StatusBar/StatusBar.css */
+.status-bar {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .status-bar button {
+    min-width: 120px;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  .refreshing {
+    animation: pulse 1.5s infinite;
+  }

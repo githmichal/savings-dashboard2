@@ -8,6 +8,8 @@
 # testing
 /coverage
 
+/dodatkowe_instrukcje
+
 # production
 /build
 
