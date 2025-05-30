@@ -1,64 +1,82 @@
-// src/components/ImportData/ImportData.js
-import React, { useState, useRef } from 'react';
-import { Card, Form, Button, Alert } from 'react-bootstrap';
-import { useAppData } from '../../context/AppDataContext';
-import { parseCSVFile, processData } from '../../utils/dataProcessing';
-import './ImportData.css';
+// src/context/AppDataContext.js
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
-function ImportData() {
-  const { updateAppData, dataSource: contextDataSource, refreshInterval, changeRefreshInterval, autoRefresh, toggleAutoRefresh } = useAppData();
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  // Używamy wartości z kontekstu jako wartości początkowej
-  const [dataSource, setDataSource] = useState(contextDataSource || 'file'); // 'file' lub 'api'
-  const [localRefreshInterval, setLocalRefreshInterval] = useState(refreshInterval || 5);
-  const fileInputRef = useRef(null);
+// URL do API Google Sheets
+const API_URL = 'https://script.google.com/macros/s/AKfycbx2VeHln3nrvxb8l0jb0rr3QZZHa3kJD532MHjJVxN1lvWEo81V4Urd1NYHWwYyMhXJ6w/exec';
+
+// Utworzenie kontekstu
+const AppDataContext = createContext();
+
+// Hook do używania kontekstu
+export const useAppData = () => useContext(AppDataContext);
+
+// Komponent Provider dla kontekstu
+export const AppDataProvider = ({ children }) => {
+  const [appData, setAppData] = useState({
+    general: {},
+    departments: [],
+    functions: [],
+    users: [],
+    timeTrends: {
+      quarters: [],
+      weeks: [],
+      days: []
+    },
+    meta: {
+      lastUpdate: null,
+      availableFunctions: []
+    }
+  });
+
+  const [filters, setFilters] = useState({
+    period: 'all',
+    app: 'all',
+    function: 'all'
+  });
+
+  const [dataLoaded, setDataLoaded] = useState(false);
   
-  // URL do naszego API Google Sheets
-  const API_URL = 'https://script.google.com/macros/s/AKfycbx2VeHln3nrvxb8l0jb0rr3QZZHa3kJD532MHjJVxN1lvWEo81V4Urd1NYHWwYyMhXJ6w/exec';
+  // Stan źródła danych
+  const [dataSource, setDataSource] = useState('file'); // 'file' lub 'api'
+  
+  // Stan interwału odświeżania (w minutach)
+  const [refreshInterval, setRefreshInterval] = useState(5 * 60 * 1000); // domyślnie 5 minut
+  
+  // Stan automatycznego odświeżania
+  const [autoRefresh, setAutoRefresh] = useState(false);
 
-  const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
-      setError(null);
-    } else {
-      setSelectedFile(null);
+  // Aktualizacja danych aplikacji
+  const updateAppData = (newData, source = 'file') => {
+    setAppData(newData);
+    setDataLoaded(true);
+    setDataSource(source);
+    
+    // Jeśli dane pochodzą z API, włączamy automatyczne odświeżanie
+    if (source === 'api') {
+      setAutoRefresh(true);
     }
   };
 
-  // Nowa funkcja obsługująca zmianę źródła danych
-  const handleDataSourceChange = (e) => {
-    setDataSource(e.target.value);
-    // Resetujemy błędy przy zmianie źródła danych
-    setError(null);
+  // Aktualizacja filtrów
+  const updateFilters = (newFilters) => {
+    setFilters({ ...filters, ...newFilters });
   };
   
-  // Nowa funkcja obsługująca zmianę interwału odświeżania
-  const handleIntervalChange = (e) => {
-    const value = parseInt(e.target.value, 10);
-    setLocalRefreshInterval(value);
-    // Aktualizujemy wartość w kontekście
-    changeRefreshInterval(value);
+  // Zmiana interwału odświeżania
+  const changeRefreshInterval = (intervalInMinutes) => {
+    setRefreshInterval(intervalInMinutes * 60 * 1000);
   };
-
-  const handleImport = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      if (dataSource === 'file') {
-        // Istniejąca logika importu z pliku CSV
-        if (!selectedFile) {
-          throw new Error('Nie wybrano pliku.');
-        }
-        
-        // Parsowanie i przetwarzanie pliku CSV (istniejący kod)
-        const parsedData = await parseCSVFile(selectedFile);
-        const processedData = processData(parsedData);
-        updateAppData(processedData, 'file');
-      } else {
-        // Nowa logika pobierania danych z API
+  
+  // Włączanie/wyłączanie automatycznego odświeżania
+  const toggleAutoRefresh = () => {
+    setAutoRefresh(!autoRefresh);
+  };
+  
+  // Ręczne odświeżenie danych z API
+  const refreshData = async () => {
+    // Odświeżamy tylko jeśli dane pochodzą z API
+    if (dataSource === 'api' && dataLoaded) {
+      try {
         const response = await fetch(API_URL);
         
         if (!response.ok) {
@@ -70,148 +88,51 @@ function ImportData() {
         // Sprawdzamy, czy otrzymane dane zawierają informację o błędzie
         if (data.error) {
           throw new Error(`Błąd API: ${data.message}`);
+          return;
         }
         
-        // Aktualizujemy dane w aplikacji, przekazując informację o źródle
-        updateAppData(data, 'api');
+        // Aktualizujemy dane w aplikacji
+        setAppData(data);
+        console.log('Dane odświeżone z API:', new Date().toLocaleTimeString());
+      } catch (error) {
+        console.error('Błąd odświeżania danych:', error);
       }
-      
-      setIsLoading(false);
-    } catch (err) {
-      console.error('Błąd importu:', err);
-      setError(err.message);
-      setIsLoading(false);
     }
   };
-
-  // Obsługa drag-and-drop
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.currentTarget.classList.add('active');
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.currentTarget.classList.remove('active');
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.currentTarget.classList.remove('active');
+  
+  // Automatyczne odświeżanie danych
+  useEffect(() => {
+    let intervalId = null;
     
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setSelectedFile(e.dataTransfer.files[0]);
-      setError(null);
+    if (autoRefresh && dataSource === 'api' && dataLoaded) {
+      intervalId = setInterval(refreshData, refreshInterval);
+      console.log(`Ustawiono automatyczne odświeżanie co ${refreshInterval / 60000} minut`);
     }
-  };
+    
+    // Czyszczenie interwału przy odmontowaniu komponentu lub zmianie zależności
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        console.log('Wyłączono automatyczne odświeżanie');
+      }
+    };
+  }, [autoRefresh, dataSource, dataLoaded, refreshInterval]);
 
   return (
-    <Card className="mb-4">
-      <Card.Body>
-        <Card.Title className="mb-3">Import danych</Card.Title>
-        {error && <Alert variant="danger">{error}</Alert>}
-        
-        {/* Dodajemy przełącznik wyboru źródła danych */}
-        <Form.Group className="mb-3">
-          <Form.Label>Wybierz źródło danych:</Form.Label>
-          <div className="d-flex">
-            <Form.Check
-              type="radio"
-              label="Plik CSV"
-              name="dataSource"
-              id="fileSource"
-              value="file"
-              checked={dataSource === 'file'}
-              onChange={handleDataSourceChange}
-              className="me-3"
-            />
-            <Form.Check
-              type="radio"
-              label="Dane na żywo (Google Sheets)"
-              name="dataSource"
-              id="apiSource"
-              value="api"
-              checked={dataSource === 'api'}
-              onChange={handleDataSourceChange}
-            />
-          </div>
-        </Form.Group>
-        
-        {/* Wyświetlamy sekcję wyboru pliku tylko jeśli wybrano źródło 'file' */}
-        {dataSource === 'file' ? (
-          <div 
-            className="drop-zone mb-3"
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <Form.Group>
-              <Form.Label>Wybierz plik CSV z danymi oszczędności:</Form.Label>
-              <Form.Control
-                type="file"
-                ref={fileInputRef}
-                accept=".csv"
-                onChange={handleFileChange}
-                className="mb-3"
-              />
-              <p className="text-muted">lub przeciągnij i upuść plik tutaj</p>
-            </Form.Group>
-          </div>
-        ) : (
-          // Wyświetlamy opcje konfiguracji API, jeśli wybrano źródło 'api'
-          <div className="api-config mb-3">
-            <Form.Group className="mb-3">
-              <Form.Label>Interwał odświeżania danych (minuty):</Form.Label>
-              <Form.Select 
-                value={localRefreshInterval} 
-                onChange={handleIntervalChange}
-              >
-                <option value="1">Co 1 minutę</option>
-                <option value="5">Co 5 minut</option>
-                <option value="15">Co 15 minut</option>
-                <option value="30">Co 30 minut</option>
-                <option value="60">Co 1 godzinę</option>
-              </Form.Select>
-            </Form.Group>
-            
-            <Form.Check 
-              type="switch"
-              id="auto-refresh-switch"
-              label="Automatyczne odświeżanie"
-              checked={autoRefresh}
-              onChange={toggleAutoRefresh}
-              className="mb-2"
-            />
-            
-            <p className="text-muted">
-              Dane będą pobierane bezpośrednio z Google Sheets 
-              {autoRefresh 
-                ? ` i automatycznie odświeżane co ${localRefreshInterval} ${localRefreshInterval === 1 ? 'minutę' : localRefreshInterval < 5 ? 'minuty' : 'minut'}.` 
-                : '. Automatyczne odświeżanie jest wyłączone.'}
-            </p>
-          </div>
-        )}
-        
-        <div className="d-flex justify-content-between align-items-center">
-          <Button 
-            variant="primary" 
-            onClick={handleImport}
-            disabled={dataSource === 'file' && !selectedFile || isLoading}
-          >
-            {isLoading ? 'Importowanie...' : 'Importuj dane'}
-          </Button>
-          {dataSource === 'file' && selectedFile && (
-            <span className="text-muted small">
-              Wybrany plik: {selectedFile.name}
-            </span>
-          )}
-        </div>
-      </Card.Body>
-    </Card>
+    <AppDataContext.Provider value={{
+      appData,
+      filters,
+      dataLoaded,
+      dataSource,
+      autoRefresh,
+      refreshInterval: refreshInterval / 60000, // Zwracamy w minutach dla łatwiejszego użycia
+      updateAppData,
+      updateFilters,
+      refreshData,
+      toggleAutoRefresh,
+      changeRefreshInterval
+    }}>
+      {children}
+    </AppDataContext.Provider>
   );
-}
-
-export default ImportData;
+};

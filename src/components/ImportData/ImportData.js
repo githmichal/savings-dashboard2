@@ -6,12 +6,13 @@ import { parseCSVFile, processData } from '../../utils/dataProcessing';
 import './ImportData.css';
 
 function ImportData() {
-  const { updateAppData } = useAppData();
+  const { updateAppData, dataSource: contextDataSource, refreshInterval, changeRefreshInterval, autoRefresh, toggleAutoRefresh } = useAppData();
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  // Dodajemy nowy stan dla wyboru źródła danych
-  const [dataSource, setDataSource] = useState('file'); // 'file' lub 'api'
+  // Używamy wartości z kontekstu jako wartości początkowej
+  const [dataSource, setDataSource] = useState(contextDataSource || 'file'); // 'file' lub 'api'
+  const [localRefreshInterval, setLocalRefreshInterval] = useState(refreshInterval || 5);
   const fileInputRef = useRef(null);
   
   // URL do naszego API Google Sheets
@@ -26,11 +27,18 @@ function ImportData() {
     }
   };
 
-  // Nowa funkcja obsługująca zmianę źródła danych
   const handleDataSourceChange = (e) => {
     setDataSource(e.target.value);
     // Resetujemy błędy przy zmianie źródła danych
     setError(null);
+  };
+  
+  // Funkcja obsługująca zmianę interwału odświeżania
+  const handleIntervalChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    setLocalRefreshInterval(value);
+    // Aktualizujemy wartość w kontekście
+    changeRefreshInterval(value);
   };
 
   const handleImport = async () => {
@@ -47,7 +55,7 @@ function ImportData() {
         // Parsowanie i przetwarzanie pliku CSV (istniejący kod)
         const parsedData = await parseCSVFile(selectedFile);
         const processedData = processData(parsedData);
-        updateAppData(processedData);
+        updateAppData(processedData, 'file');
       } else {
         // Nowa logika pobierania danych z API
         const response = await fetch(API_URL);
@@ -63,8 +71,8 @@ function ImportData() {
           throw new Error(`Błąd API: ${data.message}`);
         }
         
-        // Aktualizujemy dane w aplikacji
-        updateAppData(data);
+        // Aktualizujemy dane w aplikacji, przekazując informację o źródle
+        updateAppData(data, 'api');
       }
       
       setIsLoading(false);
@@ -152,7 +160,38 @@ function ImportData() {
             </Form.Group>
           </div>
         ) : (
-          <p className="text-muted mb-3">Dane będą pobierane bezpośrednio z Google Sheets.</p>
+          // Wyświetlamy opcje konfiguracji API, jeśli wybrano źródło 'api'
+          <div className="api-config mb-3">
+            <Form.Group className="mb-3">
+              <Form.Label>Interwał odświeżania danych (minuty):</Form.Label>
+              <Form.Select 
+                value={localRefreshInterval} 
+                onChange={handleIntervalChange}
+              >
+                <option value="1">Co 1 minutę</option>
+                <option value="5">Co 5 minut</option>
+                <option value="15">Co 15 minut</option>
+                <option value="30">Co 30 minut</option>
+                <option value="60">Co 1 godzinę</option>
+              </Form.Select>
+            </Form.Group>
+            
+            <Form.Check 
+              type="switch"
+              id="auto-refresh-switch"
+              label="Automatyczne odświeżanie"
+              checked={autoRefresh}
+              onChange={toggleAutoRefresh}
+              className="mb-2"
+            />
+            
+            <p className="text-muted">
+              Dane będą pobierane bezpośrednio z Google Sheets 
+              {autoRefresh 
+                ? ` i automatycznie odświeżane co ${localRefreshInterval} ${localRefreshInterval === 1 ? 'minutę' : localRefreshInterval < 5 ? 'minuty' : 'minut'}.` 
+                : '. Automatyczne odświeżanie jest wyłączone.'}
+            </p>
+          </div>
         )}
         
         <div className="d-flex justify-content-between align-items-center">

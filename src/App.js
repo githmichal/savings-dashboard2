@@ -6,7 +6,7 @@ import { AppDataProvider } from './context/AppDataContext';
 import ImportData from './components/ImportData/ImportData';
 import Filters from './components/Filters/Filters';
 import Dashboard from './components/Dashboard/Dashboard';
-import StatusBar from './components/StatusBar/StatusBar'; // Import nowego komponentu
+import StatusBar from './components/StatusBar/StatusBar';
 
 function App() {
   return (
@@ -34,7 +34,7 @@ function App() {
 
         <main className="container my-4">
           <ImportData />
-          <StatusBar /> {/* Dodajemy nowy komponent StatusBar */}
+          <StatusBar />
           <Filters />
           <Dashboard />
         </main>
