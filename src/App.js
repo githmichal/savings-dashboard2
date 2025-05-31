@@ -17,7 +17,7 @@ function App() {
           <nav className="navbar navbar-expand-lg navbar-light">
             <div className="container">
               <a className="navbar-brand" href="/">
-                <img src="/assets/logo.png" alt="Olimp Marketplace" height="40" />
+                <img src={process.env.PUBLIC_URL + "/assets/logo.png"} alt="Olimp Marketplace" height="40" />
               </a>
               <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span className="navbar-toggler-icon"></span>
