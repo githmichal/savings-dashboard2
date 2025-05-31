@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/savings-dashboard2/static/css/main.d42935a3.css",
+    "main.js": "/savings-dashboard2/static/js/main.536c0e42.js",
+    "static/js/453.7972407e.chunk.js": "/savings-dashboard2/static/js/453.7972407e.chunk.js",
+    "index.html": "/savings-dashboard2/index.html",
+    "main.d42935a3.css.map": "/savings-dashboard2/static/css/main.d42935a3.css.map",
+    "main.536c0e42.js.map": "/savings-dashboard2/static/js/main.536c0e42.js.map",
+    "453.7972407e.chunk.js.map": "/savings-dashboard2/static/js/453.7972407e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d42935a3.css",
+    "static/js/main.536c0e42.js"
+  ]
+}
