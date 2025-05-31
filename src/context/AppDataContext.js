@@ -2,7 +2,7 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 
 // URL do API Google Sheets
-const API_URL = 'https://script.google.com/macros/s/AKfycbxm9wuadf18rwliSnYHUcgOdxYZfuk7HgTSj82Xrzl5w7-o5zVm1z-pYUYsAY6FDOVn/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzO7W9sw4ZIhCYAjh42uat2eMBwUphf7VBLuOizj2uesRl5NwD_dUPCfqrJuYCEtCj2DA/exec';
 
 // Utworzenie kontekstu
 const AppDataContext = createContext();
