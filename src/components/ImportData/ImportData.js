@@ -16,7 +16,7 @@ function ImportData() {
   const fileInputRef = useRef(null);
   
   // URL do naszego API Google Sheets
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzO7W9sw4ZIhCYAjh42uat2eMBwUphf7VBLuOizj2uesRl5NwD_dUPCfqrJuYCEtCj2DA/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwnP4fnHSOtmyyyNeeDWfpifL92F1w3hAV-D2WY7AhqdjHoz29RD86pe_KWnR35LFqdfw/exec';
 
   const handleFileChange = (e) => {
     if (e.target.files.length > 0) {
